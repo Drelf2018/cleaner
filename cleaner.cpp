@@ -4,6 +4,7 @@
 #include <vector>
 #include <cstring>
 #include <map>
+#include <windows.h>
 using namespace std;
 
 map<string,string> mp;
@@ -60,17 +61,15 @@ void init()
 
 int main()
 {
+	system("color 8E");
 	init();
 	vector<string> files;
-	getFiles(".",files);
+	getFiles("./file",files);
 	int size = files.size();
     for (int i = 0; i < size; i++)
     {
-        cout<<files[i]<<"->"<<mp[getPos(files[i])]<< endl;
-        
-        /*
-        move ad mp[ad];
-        */
+        cout<<"["<<files[i]<<"]>>>["<<mp[getPos(files[i])]<<"]"<<endl;
+        /*move ad mp[ad];*/
     }
 	return 0;
 }
