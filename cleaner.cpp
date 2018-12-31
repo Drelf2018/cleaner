@@ -5,6 +5,8 @@
 #include <cstring>
 #include <map>
 #include <windows.h>
+#include <time.h>
+#include <cstdio>
 using namespace std;
 
 map<string,string> mp;
@@ -54,10 +56,44 @@ void init()
 		len=reader.length()-1;
 		while(pos<=len&&reader[pos++]!='[');s=pos;
 		while(pos<=len&&reader[pos++]!=']');t=pos-2;
-		//cout<<reader.substr(s,t)<<" "<<reader.substr(pos,len)<<endl;
-		mp[reader.substr(s,t)]=reader.substr(pos,len);
+		//cout<<reader.substr(s,t-s+1)<<" "<<reader.substr(pos,len-pos+1)<<endl;
+		mp[reader.substr(s,t-s+1)]=reader.substr(pos,len-pos+1);
 	}
 }
+
+string getTime()
+{
+	char tmp[64];
+	string r;
+	time_t t = time(0); 
+	strftime(tmp,sizeof(tmp),"%Y-%m-%d",localtime(&t) );
+	r=tmp;
+	return r; 
+}
+
+void move(string file)
+{
+	int len=0,i=1,j=2;
+	string path=".";
+	cout<<"["<<file<<"]>>>["<<mp[getPos(file)]<<"]"<<endl;
+	if(mp[getPos(file)]!="")
+	{
+		path.append(mp[getPos(file)]);
+		len=path.length();//***
+		while(i<len&&j<len)
+		{
+			while(path[j]!='/')j++;
+			if(path.substr(i+1,j-i-1)=="AutoTime")
+				path.replace(i+1,j-i-1,getTime()),j=path.find("/",j);
+			//cout<<path.substr(i+1,j-i-1)<<endl;
+			i=j++; 
+		}
+		cout<<"here"<<endl;
+		cout<<path<<endl;
+		while(CreateDirectory(path.c_str(),NULL));
+	}
+    /*move ad mp[ad];*/
+} 
 
 int main()
 {
@@ -68,8 +104,7 @@ int main()
 	int size = files.size();
     for (int i = 0; i < size; i++)
     {
-        cout<<"["<<files[i]<<"]>>>["<<mp[getPos(files[i])]<<"]"<<endl;
-        /*move ad mp[ad];*/
+        move(files[i]);
     }
 	return 0;
 }
