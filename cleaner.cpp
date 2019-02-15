@@ -13,14 +13,14 @@ map<string,string> mp;
 
 void getFiles(string path, vector<string>& files)
 {
-    long   hFile = 0;//文件句柄  
+    long hFile = 0;//文件句柄  
     struct _finddata_t fileinfo;//文件信息  
     string p;
-    if ((hFile = _findfirst(p.assign(path).append("/*").c_str(), &fileinfo)) != -1)
+    if((hFile=_findfirst(p.assign(path).append("/*").c_str(),&fileinfo))!=-1)
     {
         do
         {
-            //如果是目录,迭代之  ,但我不需要 
+            //如果是目录,迭代之,但我不需要 
             //如果不是,加入列表  
             if ((fileinfo.attrib &  _A_SUBDIR))
             {
@@ -46,7 +46,7 @@ string getPos(string fname)
 }
 
 void init()
-{
+{//读入设置文件 
 	int pos,s,t,len;
 	string reader,pots,path;
 	ifstream fin("clean.inf");
@@ -56,13 +56,12 @@ void init()
 		len=reader.length()-1;
 		while(pos<=len&&reader[pos++]!='[');s=pos;
 		while(pos<=len&&reader[pos++]!=']');t=pos-2;
-		//cout<<reader.substr(s,t-s+1)<<" "<<reader.substr(pos,len-pos+1)<<endl;
 		mp[reader.substr(s,t-s+1)]=reader.substr(pos,len-pos+1);
 	}
 }
 
 string getTime()
-{
+{//获取时间 
 	char tmp[64];
 	string r;
 	time_t t = time(0); 
@@ -72,39 +71,38 @@ string getTime()
 }
 
 void move(string file)
-{
+{//移动文件 
 	int len=0,i=1,j=2;
 	string path=".";
-	cout<<"["<<file<<"]>>>["<<mp[getPos(file)]<<"]"<<endl;
 	if(mp[getPos(file)]!="")
 	{
 		path.append(mp[getPos(file)]);
-		len=path.length();//***
+		len=path.length();
 		while(i<len&&j<len)
 		{
 			while(path[j]!='/')j++;
 			if(path.substr(i+1,j-i-1)=="AutoTime")
 				path.replace(i+1,j-i-1,getTime()),j=path.find("/",j);
-			//cout<<path.substr(i+1,j-i-1)<<endl;
+			if(CreateDirectory(path.substr(0,j).c_str(),NULL))
+				cout<<"Created "<<path.substr(0,j).c_str()<<endl;
 			i=j++; 
 		}
-		cout<<"here"<<endl;
-		cout<<path<<endl;
-		while(CreateDirectory(path.c_str(),NULL));
 	}
+	cout<<"["<<file<<"]>>>["<<path.c_str()<<"]"<<endl;
+	//mp[getPos(file)]
     /*move ad mp[ad];*/
 } 
 
 int main()
 {
-	system("color 8E");
 	init();
 	vector<string> files;
-	getFiles("./file",files);
-	int size = files.size();
-    for (int i = 0; i < size; i++)
+	getFiles("D:/file",files);
+	int size=files.size();
+    for (int i=0;i<size;i++)
     {
-        move(files[i]);
+		if(mp[getPos(files[i])]!="")
+        	move(files[i]);
     }
 	return 0;
 }
